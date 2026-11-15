@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+body { margin: 0; background: #f0f4fa; color: #202a38; font: 16px system-ui, sans-serif; }
+main { max-width: 720px; margin: 2rem auto; padding: 0 1rem; }
+h1 { font-size: 2.3rem; }
+h2, h3 { margin-top: 0; }
+form, article { background: white; border: 1px solid #d6deea; border-radius: 12px; padding: 1rem; margin-bottom: 1rem; }
+label { display: block; margin-bottom: .8rem; }
+input, textarea, select { width: 100%; display: block; margin-top: .3rem; padding: .55rem; font: inherit; border: 1px solid #a9b8ca; border-radius: 5px; }
+button { background: #254e91; color: white; border: 0; border-radius: 6px; padding: .5rem .85rem; font: inherit; margin-right: .4rem; cursor: pointer; }
+small { color: #344970; }
+article p { white-space: pre-wrap; overflow-wrap: anywhere; }
+article h3 { overflow-wrap: anywhere; }
+#status { color: #8b2820; }

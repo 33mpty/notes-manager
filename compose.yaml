@@ -1,0 +1,36 @@
+services:
+  web:
+    build: ./web
+    image: ${IMAGE_PREFIX:-notes-lab}-web:${IMAGE_TAG:-local}
+    ports:
+      - "127.0.0.1:${WEB_PORT:-8080}:80"
+    depends_on:
+      notes:
+        condition: service_healthy
+      labels:
+        condition: service_healthy
+    restart: unless-stopped
+    networks: [app]
+
+  notes:
+    build: ./notes
+    image: ${IMAGE_PREFIX:-notes-lab}-notes:${IMAGE_TAG:-local}
+    environment:
+      NOTES_DB: /data/notes.db
+    volumes:
+      - notes_data:/data
+    restart: unless-stopped
+    networks: [app]
+
+  labels:
+    build: ./labels
+    image: ${IMAGE_PREFIX:-notes-lab}-labels:${IMAGE_TAG:-local}
+    restart: unless-stopped
+    networks: [app]
+
+networks:
+  app:
+    driver: bridge
+
+volumes:
+  notes_data:

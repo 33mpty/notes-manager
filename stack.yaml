@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+  web:
+    image: ${IMAGE_PREFIX:-notes-lab}-web:${IMAGE_TAG:-local}
+    ports:
+      - "8080:80"
+    networks: [app]
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        parallelism: 1
+        failure_action: rollback
+
+  notes:
+    image: ${IMAGE_PREFIX:-notes-lab}-notes:${IMAGE_TAG:-local}
+    environment:
+      NOTES_DB: /data/notes.db
+    volumes:
+      - notes_data:/data
+    networks: [app]
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.labels.notes_data == true]
+      update_config:
+        order: stop-first
+        failure_action: rollback
+
+  labels:
+    image: ${IMAGE_PREFIX:-notes-lab}-labels:${IMAGE_TAG:-local}
+    networks: [app]
+    deploy:
+      replicas: 2
+      update_config:
+        order: start-first
+        failure_action: rollback
+
+networks:
+  app:
+    driver: overlay
+
+volumes:
+  notes_data:

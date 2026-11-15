@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Менеджер заметок</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<main>
+  <h1>Мои заметки</h1>
+  <form id="form">
+    <h2 id="form-title">Новая заметка</h2>
+    <label>Заголовок <input id="title" maxlength="80" required></label>
+    <label>Текст <textarea id="body" rows="4" maxlength="2000"></textarea></label>
+    <label>Метка <select id="label"><option>Без метки</option></select></label>
+    <div class="buttons">
+      <button id="save">Сохранить</button>
+      <button type="button" id="cancel" hidden>Отменить правку</button>
+    </div>
+  </form>
+  <p id="status" role="status"></p>
+  <h2>Список заметок</h2>
+  <section id="notes" aria-label="Список заметок"></section>
+</main>
+</body>
+</html>

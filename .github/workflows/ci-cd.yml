@@ -1,0 +1,46 @@
+name: Проверка и выпуск
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Сборка и проверка через Compose
+        run: |
+          docker compose up -d --build --wait --wait-timeout 90
+          python3 scripts/check.py
+      - name: Журналы и остановка Compose
+        if: always()
+        run: |
+          docker compose logs --tail=50
+          docker compose down -v
+      - name: Развёртывание на временном стенде Swarm
+        run: |
+          docker swarm init
+          docker node update --label-add notes_data=true "$(docker info --format '{{.Swarm.NodeID}}')"
+          docker stack deploy -c stack.yaml --resolve-image never noteslab
+          for i in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:8080/api/notes >/dev/null &&
+               curl -fsS http://127.0.0.1:8080/api/labels >/dev/null; then
+              python3 scripts/check.py
+              exit 0
+            fi
+            sleep 2
+          done
+          docker stack services noteslab
+          docker stack ps --no-trunc noteslab
+          exit 1
+      - name: Публикация архива образов
+        if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
+        run: docker save notes-lab-web:local notes-lab-notes:local notes-lab-labels:local | gzip > notes-images.tar.gz
+      - uses: actions/upload-artifact@v4
+        if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
+        with:
+          name: notes-images-amd64
+          path: notes-images.tar.gz
