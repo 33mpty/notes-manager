@@ -1,0 +1,39 @@
+# Два отдельных Docker Engine внутри учебных контейнеров.
+# Только для локальной демонстрации. Это не два физических сервера.
+services:
+  manager:
+    hostname: manager
+    image: docker:27-dind
+    privileged: true
+    command: [dockerd, --host=unix:///var/run/docker.sock]
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    ports:
+      - "127.0.0.1:18081:8080"
+    volumes:
+      - manager_data:/var/lib/docker
+    networks:
+      lab:
+        ipv4_address: 172.30.77.2
+  worker:
+    hostname: worker
+    image: docker:27-dind
+    privileged: true
+    command: [dockerd, --host=unix:///var/run/docker.sock]
+    environment:
+      DOCKER_TLS_CERTDIR: ""
+    ports:
+      - "127.0.0.1:18082:8080"
+    volumes:
+      - worker_data:/var/lib/docker
+    networks:
+      lab:
+        ipv4_address: 172.30.77.3
+networks:
+  lab:
+    ipam:
+      config:
+        - subnet: 172.30.77.0/24
+volumes:
+  manager_data:
+  worker_data:
